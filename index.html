@@ -92,9 +92,12 @@
 
     socket.on('drawing', function(data) {
       console.log(data);
+      fill(data.colR, data.colG, data.colB);
+      rect(data.posX, data.posY, pixelSize, pixelSize)
     });
 
     function drawingInit() {
+      console.log("teleporting...");
       r = floor(random(255));
       g = floor(random(255));
       b = floor(random(255));
