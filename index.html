@@ -66,25 +66,16 @@
 
     setInterval(drawingInit, 11000);
 
-
-
     var currX = 0;
     var currY = 0;
-    var row = 10;
-    var col = 10;
     var pixelSize = 10;
     var r, g, b;
 
-    var dataSet = {
-      posX: currX,
-      posY: currY,
-      size: pixelSize,
-      colorR: r,
-      colorG: g,
-      colorB: b
-    };
+    var row = 10;
+    var col = 10;
 
     function setup() {
+
       background(255);
       var canvas = createCanvas(500, 700);
 
@@ -96,15 +87,17 @@
           rect(i, j, row, col);
         }
       }
+      drawingInit()
     }
 
 
+    socket.on('drawing', function(data) {
+      console.log(data);
+      fill(data.colR, data.colG, data.colB);
+      rect(data.posX, data.posY, data.size, data.size)
+    });
+
     function draw() {
-      socket.on('drawing', function(data) {
-        console.log(data);
-        fill(r, g, b);
-        rect(currX, currY, pixelSize, pixelSize)
-      });
     }
 
 
@@ -115,26 +108,79 @@
       fill(r, g, b);
       currX = floor(random(width / col)) * col;
       currY = floor(random(height / row)) * row;
-      rect(currX, currY, pixelSize, pixelSize)
+      rect(currX, currY, pixelSize, pixelSize);
+
+
+      var dataSet = {
+        posX: currX,
+        posY: currY,
+        size: pixelSize,
+        colR: r,
+        colG: g,
+        colB: b
+      };
+
+      console.log(dataSet);
+      socket.emit('drawing', dataSet);
     }
 
     function keyPressed() {
       // console.log(keyCode);
       if (keyCode == UP_ARROW || keyCode == 87) {
         currY -= pixelSize;
+
+        var dataSet = {
+          posX: currX,
+          posY: currY,
+          size: pixelSize,
+          colR: r,
+          colG: g,
+          colB: b
+        };
+
         socket.emit('drawing', dataSet);
 
       } else if (keyCode == DOWN_ARROW || keyCode == 83) {
         currY += pixelSize;
+
+        var dataSet = {
+          posX: currX,
+          posY: currY,
+          size: pixelSize,
+          colR: r,
+          colG: g,
+          colB: b
+        };
+
         socket.emit('drawing', dataSet);
 
 
       } else if (keyCode == RIGHT_ARROW || keyCode == 68) {
         currX += pixelSize;
+
+        var dataSet = {
+          posX: currX,
+          posY: currY,
+          size: pixelSize,
+          colR: r,
+          colG: g,
+          colB: b
+        };
+
         socket.emit('drawing', dataSet);
 
       } else if (keyCode == LEFT_ARROW || keyCode == 65) {
         currX -= pixelSize;
+
+        var dataSet = {
+          posX: currX,
+          posY: currY,
+          size: pixelSize,
+          colR: r,
+          colG: g,
+          colB: b
+        };
+
         socket.emit('drawing', dataSet);
       }
 
