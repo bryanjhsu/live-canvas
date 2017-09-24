@@ -36,7 +36,7 @@ io.sockets.on('connection',
     console.log("We have a new client: " + socket.id);
     socket.on('drawing', function(data) {
       // Data comes in as whatever was sent, including objects
-      console.log(data.posX, data.posY, data.size, data.colR, data.colG, data.colB);
+      console.log(data.posX, data.posY, data.colR, data.colG, data.colB);
       // Send it to all of the clients
       io.emit('drawing', data);
     });

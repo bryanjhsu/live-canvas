@@ -75,7 +75,6 @@
     var col = 10;
 
     function setup() {
-
       background(255);
       var canvas = createCanvas(500, 700);
 
@@ -93,13 +92,7 @@
 
     socket.on('drawing', function(data) {
       console.log(data);
-      fill(data.colR, data.colG, data.colB);
-      rect(data.posX, data.posY, data.size, data.size)
     });
-
-    function draw() {
-    }
-
 
     function drawingInit() {
       r = floor(random(255));
@@ -110,11 +103,9 @@
       currY = floor(random(height / row)) * row;
       rect(currX, currY, pixelSize, pixelSize);
 
-
       var dataSet = {
         posX: currX,
         posY: currY,
-        size: pixelSize,
         colR: r,
         colG: g,
         colB: b
@@ -126,63 +117,33 @@
 
     function keyPressed() {
       // console.log(keyCode);
+      var isMoved = false;
       if (keyCode == UP_ARROW || keyCode == 87) {
         currY -= pixelSize;
-
-        var dataSet = {
-          posX: currX,
-          posY: currY,
-          size: pixelSize,
-          colR: r,
-          colG: g,
-          colB: b
-        };
-
-        socket.emit('drawing', dataSet);
-
+        isMoved = true;
       } else if (keyCode == DOWN_ARROW || keyCode == 83) {
         currY += pixelSize;
-
-        var dataSet = {
-          posX: currX,
-          posY: currY,
-          size: pixelSize,
-          colR: r,
-          colG: g,
-          colB: b
-        };
-
-        socket.emit('drawing', dataSet);
-
-
+        isMoved = true;
       } else if (keyCode == RIGHT_ARROW || keyCode == 68) {
         currX += pixelSize;
-
-        var dataSet = {
-          posX: currX,
-          posY: currY,
-          size: pixelSize,
-          colR: r,
-          colG: g,
-          colB: b
-        };
-
-        socket.emit('drawing', dataSet);
-
+        isMoved = true;
       } else if (keyCode == LEFT_ARROW || keyCode == 65) {
         currX -= pixelSize;
-
-        var dataSet = {
+        isMoved = true;
+      }
+      if(isMoved)
+      {
+        var data = {
           posX: currX,
           posY: currY,
-          size: pixelSize,
           colR: r,
           colG: g,
           colB: b
         };
-
-        socket.emit('drawing', dataSet);
-      }
+        fill(data.colR, data.colG, data.colB);
+        rect(data.posX, data.posY, pixelSize, pixelSize)
+        socket.emit('drawing', data);
+      };
 
       return false;
     }
