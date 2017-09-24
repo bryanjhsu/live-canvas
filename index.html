@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title> Drawing Collaboration
+  </title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.14/p5.js"></script>
+  <script type="text/javascript" src="/socket.io/socket.io.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+    }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+    }
+
+    canvas {
+      display: block;
+    }
+
+    #countdown {
+      position: absolute;
+      left: 520px;
+      top: 0px;
+      font-size: 5em;
+      font-family: monospace;
+    }
+
+    #image {
+      position: absolute;
+      left: 520px;
+      top: 100px;
+      width: 400px;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="countdown"> </div>
+  <img id="image" src="https://www.what-dog.net/Images/faces2/scroll0015.jpg"> </img>
+
+  <script>
+    // socket.io setting
+    var socket = io.connect();
+
+    socket.on('connect', function() {
+      console.log("Connected");
+    });
+
+    // countdown part
+    var timeleft = 0;
+    var downloadTimer = setInterval(function() {
+      var value = 10 - timeleft;
+      timeleft++;
+      document.getElementById('countdown').innerHTML = value;
+      if (value <= 0) {
+        value = 10;
+        timeleft = 0;
+      }
+    }, 1000);
+
+    setInterval(drawingInit, 11000);
+
+
+
+    var currX = 0;
+    var currY = 0;
+    var row = 10;
+    var col = 10;
+    var pixelSize = 10;
+    var r, g, b;
+
+    var dataSet = {
+      posX: currX,
+      posY: currY,
+      size: pixelSize,
+      colorR: r,
+      colorG: g,
+      colorB: b
+    };
+
+    function setup() {
+      background(255);
+      var canvas = createCanvas(500, 700);
+
+      for (var i = 0; i < width; i += col) {
+        for (var j = 0; j < height; j += row) {
+          fill(255);
+          stroke(200);
+          strokeWeight(0.5);
+          rect(i, j, row, col);
+        }
+      }
+    }
+
+
+    function draw() {
+      socket.on('drawing', function(data) {
+        console.log(data);
+        fill(r, g, b);
+        rect(currX, currY, pixelSize, pixelSize)
+      });
+    }
+
+
+    function drawingInit() {
+      r = floor(random(255));
+      g = floor(random(255));
+      b = floor(random(255));
+      fill(r, g, b);
+      currX = floor(random(width / col)) * col;
+      currY = floor(random(height / row)) * row;
+      rect(currX, currY, pixelSize, pixelSize)
+    }
+
+    function keyPressed() {
+      // console.log(keyCode);
+      if (keyCode == UP_ARROW || keyCode == 87) {
+        currY -= pixelSize;
+        socket.emit('drawing', dataSet);
+
+      } else if (keyCode == DOWN_ARROW || keyCode == 83) {
+        currY += pixelSize;
+        socket.emit('drawing', dataSet);
+
+
+      } else if (keyCode == RIGHT_ARROW || keyCode == 68) {
+        currX += pixelSize;
+        socket.emit('drawing', dataSet);
+
+      } else if (keyCode == LEFT_ARROW || keyCode == 65) {
+        currX -= pixelSize;
+        socket.emit('drawing', dataSet);
+      }
+
+      return false;
+    }
+  </script>
+</body>
+
+</html>
