@@ -3,7 +3,7 @@ var http = require('http');
 var fs = require('fs'); // Using the filesystem module
 var httpServer = http.createServer(requestHandler);
 var url = require('url');
-httpServer.listen(8080);
+httpServer.listen(8082);
 
 function requestHandler(req, res) {
 
@@ -26,6 +26,23 @@ function requestHandler(req, res) {
 
 }
 
+var pixelSize = 10;
+var r, g, b;
+
+var board = [];
+for(var i = 0; i < 50; i++)
+{
+  board[i] = [];
+  for(var j = 0; j < 50; j ++)
+  {
+        var data = {
+          r: 255,
+          b: 255,
+          g: 255,
+        };
+    board[i][j] = data;
+  }
+}
 
 // WebSocket Portion
 var io = require('socket.io').listen(httpServer);
@@ -34,11 +51,20 @@ io.sockets.on('connection',
   // We are given a websocket object in our function
   function(socket) {
     console.log("We have a new client: " + socket.id);
-    socket.on('drawing', function(data) {
+    socket.emit("init", board);
+
+    socket.on('draw', function(data) {
       // Data comes in as whatever was sent, including objects
       console.log(data.posX, data.posY, data.colR, data.colG, data.colB);
       // Send it to all of the clients
-      io.emit('drawing', data);
+      var color = {
+          r: data.colR,
+          b: data.colB,
+          g: data.colG,
+        };
+      console.log(board.length);
+      board[data.posX/10][data.posY/10] = color;
+      io.emit('draw', data);
     });
   }
 );
