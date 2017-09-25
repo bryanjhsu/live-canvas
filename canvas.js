@@ -6,6 +6,10 @@ var redButton = null;
 var blueButton = null;
 var redScore = null;
 var blueScore = null;
+var redSection = null;
+var blueSection = null;
+var finalMessage = null;
+
 
 introPage = document.getElementById('introPage');
 drawingPage = document.getElementById('drawingPage');
@@ -13,6 +17,9 @@ redButton = document.getElementById('redButton');
 blueButton = document.getElementById('blueButton');
 redScore = document.getElementById('redScore');
 blueScore = document.getElementById('blueScore');
+redSection = document.getElementById('redSection');
+blueSection = document.getElementById('blueSection');
+finalMessage = document.getElementById('finalMessage');
 
 introPage.style.display = "block"
 drawingPage.style.display = "none"
@@ -37,9 +44,9 @@ var yourColorClass = "";
 
 function chooseRed() {
   changePage(drawingPage);
-    yourColorClass = "red";
-    console.log("you are on the red team");
-    drawingInit(yourColorClass);
+  yourColorClass = "red";
+  console.log("you are on the red team");
+  drawingInit(yourColorClass);
 }
 
 function chooseBlue() {
@@ -133,8 +140,38 @@ socket.on('draw', function(data) {
 socket.on('update', function(data) {
   console.log("red count: " + data.reds);
   redScore.innerHTML = data.reds;
+  redSection.style.width = data.reds / (data.blues + data.reds) * 100 + '%'
+  redSection.style.transition = 'width 1s'
+
   console.log("blue count: " + data.blues);
-  blueScore.innerHTML =  data.blues;
+  blueScore.innerHTML = data.blues;
+  blueSection.style.width = data.blues / (data.blues + data.reds) * 100 + '%';
+  blueSection.style.transition = 'width 1s'
+
+  var totalScore = data.reds + data.blues;
+
+  if (totalScore >= 50 && totalScore !== 0) {
+    if (data.reds > data.blues) {
+      redSection.style.width = '100%';
+      redSection.style.transition = 'width 1s ease';
+      redScore.innerHTML = '';
+      redScore.style.border = 'none';
+      blueScore.innerHTML = '';
+      blueScore.style.border = 'none';
+    }
+    if (data.blues > data.reds) {
+      blueSection.style.width = '100%';
+      blueSection.style.transition = 'width 1s ease';
+      redScore.innerHTML = '';
+      redScore.style.border = 'none';
+      blueScore.innerHTML = '';
+      blueScore.style.border = 'none';
+    }
+    // figure it out transition stuff
+    finalMessage.innerHTML = "DEMOCRACY";
+    finalMessage.style.fontSize = '7em';
+    finalMessage.style.transition = 'font-size 3s ease';
+  }
 });
 
 
