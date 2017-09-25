@@ -150,7 +150,7 @@ socket.on('update', function(data) {
 
   var totalScore = data.reds + data.blues;
 
-  if (totalScore >= 50 && totalScore !== 0) {
+  if (totalScore >= 5000 && totalScore !== 0) {
     if (data.reds > data.blues) {
       redSection.style.width = '100%';
       redSection.style.transition = 'width 1s ease';
