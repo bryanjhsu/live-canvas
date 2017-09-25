@@ -28,19 +28,36 @@ function requestHandler(req, res) {
 
 var pixelSize = 10;
 var r, g, b;
-
+var board_width = 1000;
+var board_height = 500;
 var board = [];
-for(var i = 0; i < 50; i++)
+
+for(var i = 0; i < board_width/pixelSize; i++)
 {
   board[i] = [];
-  for(var j = 0; j < 50; j ++)
+  for(var j = 0; j < board_height/pixelSize; j++)
   {
-        var data = {
+    console.log("setting color to: " + i);
+    if(i >45 && i<55)
+    {
+      var colorData = 
+      {
+        r: 100,
+        b: 100,
+        g: 100,
+      }
+      board[i][j] = colorData;
+    }
+    else
+    {
+      var colorData = {
           r: 255,
           b: 255,
           g: 255,
         };
-    board[i][j] = data;
+
+        board[i][j] = colorData;
+    }
   }
 }
 
@@ -64,7 +81,7 @@ io.sockets.on('connection',
         };
       console.log(board.length);
       board[data.posX/10][data.posY/10] = color;
-      io.emit('draw', data);
+      io.sockets.emit('draw', data);
     });
   }
 );
