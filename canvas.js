@@ -1,3 +1,55 @@
+// page selection part
+var currentPage = null;
+var introPage = null;
+var drawingPage = null;
+var redButton = null;
+var blueButton = null;
+var redScore = null;
+var blueScore = null;
+
+introPage = document.getElementById('introPage');
+drawingPage = document.getElementById('drawingPage');
+redButton = document.getElementById('redButton');
+blueButton = document.getElementById('blueButton');
+redScore = document.getElementById('redScore');
+blueScore = document.getElementById('blueScore');
+
+introPage.style.display = "block"
+drawingPage.style.display = "none"
+
+redButton.addEventListener('click', chooseRed);
+blueButton.addEventListener('click', chooseBlue);
+
+changePage(introPage);
+
+function changePage(newPage) {
+  if (currentPage != null) {
+    currentPage.style.display = "none";
+  }
+  currentPage = newPage;
+  currentPage.style.display = "block";
+  console.log('page is changed to ' + newPage.id);
+}
+
+
+// assign the team
+var yourColorClass = "";
+
+function chooseRed() {
+  changePage(drawingPage);
+    yourColorClass = "red";
+    console.log("you are on the red team");
+    drawingInit(yourColorClass);
+}
+
+function chooseBlue() {
+  changePage(drawingPage);
+  yourColorClass = "blue";
+  console.log("you are on the blue team");
+  drawingInit(yourColorClass);
+}
+
+
 // socket.io setting
 var socket = io.connect();
 
@@ -19,9 +71,9 @@ var timeleft = 0;
 //position + color
 var currX = 0;
 var currY = 0;
-var r = Math.floor(Math.random()*255);
-var g = Math.floor(Math.random()*255);
-var b = Math.floor(Math.random()*255);
+var r = Math.floor(Math.random() * 255);
+var g = Math.floor(Math.random() * 255);
+var b = Math.floor(Math.random() * 255);
 
 //grid settings
 var pixelSize = 10;
@@ -33,6 +85,8 @@ var grid_height = 500;
 function setup() {
   background(255);
   var canvas = createCanvas(grid_width, grid_height);
+  canvas.id('canvas');
+  canvas.parent('drawingPage');
 
   for (var i = 0; i < width; i += pixelSize) {
     for (var j = 0; j < height; j += pixelSize) {
@@ -42,31 +96,25 @@ function setup() {
       rect(i, j, pixelSize, pixelSize);
     }
   }
-  var yourColorClass = "";
-  if(Math.random() < 0.5)
-  {
-    yourColorClass = "red";
-    console.log("you are on the red team");
-  }
-  else
-  {
-    yourColorClass = "blue";
-    console.log("you are on the blue team");
-  }
-  drawingInit(yourColorClass);
+  // var yourColorClass = "";
+  // if (Math.random() < 0.5) {
+  //   yourColorClass = "red";
+  //   console.log("you are on the red team");
+  // } else {
+  //   yourColorClass = "blue";
+  //   console.log("you are on the blue team");
+  // }
+  // drawingInit(yourColorClass);
 }
-
 
 //receive on first load of the page. draws the live board
 socket.on('init', function(data) {
   // console.log(data);
-  for(var i = 0; i < 100; i++)
-  {
-    for(var j = 0; j < 50; j++)
-    {
+  for (var i = 0; i < 100; i++) {
+    for (var j = 0; j < 50; j++) {
       var color = data[i][j];
       fill(color.r, color.g, color.b);
-      rect(i*pixelSize, j*pixelSize, pixelSize, pixelSize)
+      rect(i * pixelSize, j * pixelSize, pixelSize, pixelSize)
     }
   }
 });
@@ -81,38 +129,39 @@ socket.on('draw', function(data) {
 
 //will receive every 10 seconds from server, updating the red and blue counts;
 //data.reds and data.blues to get count of each
+//each count will be shown above the canvas
 socket.on('update', function(data) {
   console.log("red count: " + data.reds);
+  redScore.innerHTML = data.reds;
   console.log("blue count: " + data.blues);
+  blueScore.innerHTML =  data.blues;
 });
 
 
 
 var r, g, b;
-//initialize board with client "snake" 
+//initialize board with client "snake"
 //emits to server to update this client's snake position
 function drawingInit(color) {
 
-  if(color == "red")
-  {
-    currX = floor(random(width/ 2 / pixelSize)) * pixelSize;
+  if (color == "red") {
+    currX = floor(random(width / 2 / pixelSize)) * pixelSize;
     currY = floor(random(height / pixelSize)) * pixelSize;
 
-    r = 255-Math.floor(Math.random()*20);;
-    g = Math.floor(Math.random()*120);
-    b = Math.floor(Math.random()*120);
+    r = 255 - Math.floor(Math.random() * 20);;
+    g = Math.floor(Math.random() * 120);
+    b = Math.floor(Math.random() * 120);
 
-  }
-  else //blue
+  } else //blue
   {
-    currX = floor(random(width / 2 / pixelSize) + grid_width/20) * pixelSize;
+    currX = floor(random(width / 2 / pixelSize) + grid_width / 20) * pixelSize;
     currY = floor(random(height / pixelSize)) * pixelSize;
 
-    r = Math.floor(Math.random()*120);
-    g = Math.floor(Math.random()*120);
-    b = 255-Math.floor(Math.random()*20);
+    r = Math.floor(Math.random() * 120);
+    g = Math.floor(Math.random() * 120);
+    b = 255 - Math.floor(Math.random() * 20);
   }
-  
+
   var data = {
     posX: currX,
     posY: currY,
@@ -133,33 +182,28 @@ function keyPressed() {
   // console.log(keyCode);
   var isMoved = false;
   if (keyCode == UP_ARROW || keyCode == 87) {
-    if(currY > 0)
-    {
+    if (currY > 0) {
       currY -= pixelSize;
       isMoved = true;
     }
   } else if (keyCode == DOWN_ARROW || keyCode == 83) {
-    if(currY < grid_height-10)
-    {
+    if (currY < grid_height - 10) {
       currY += pixelSize;
       isMoved = true;
     }
   } else if (keyCode == RIGHT_ARROW || keyCode == 68) {
-    if(currX < grid_width-10)
-    {
+    if (currX < grid_width - 10) {
       currX += pixelSize;
       isMoved = true;
     }
   } else if (keyCode == LEFT_ARROW || keyCode == 65) {
-    if(currX > 0)
-    {
+    if (currX > 0) {
       currX -= pixelSize;
       isMoved = true;
     }
   }
 
-  if(isMoved)
-  {
+  if (isMoved) {
     var data = {
       posX: currX,
       posY: currY,

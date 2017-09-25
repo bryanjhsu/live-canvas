@@ -3,8 +3,7 @@
   padding: 0;
 }
 
-html,
-body {
+html, body {
   width: 100%;
   height: 100%;
 }
@@ -13,17 +12,109 @@ canvas {
   display: block;
 }
 
-#countdown {
+/*#countdown {
   position: absolute;
-  left: 520px;
-  top: 0px;
-  font-size: 5em;
-  font-family: monospace;
+  width: 100px;
+  top: 0%;
+  left: 50%;
+  margin-left: -50px;
+  color:white;
+  font-size: 3.5em;
+  text-align: center;
+  font-family: 'Kanit', sans-serif;
+}*/
+
+
+#introPage {
+  width: 100%;
+  height: 100%;
 }
 
-#image {
+#yesSection {
+  float: left;
+  width: 50%;
+  height: 100%;
+  background: black;
+}
+
+#noSection {
+  float: right;
+  width: 50%;
+  height: 100%;
+  background: black;
+}
+
+#redSection {
+  float: left;
+  width: 49.5%;
+  height: 100%;
+  background: #e81348;
+}
+
+#blueSection {
+  float: right;
+  width: 50.5%;
+  height: 100%;
+  background: #147ee8;
+}
+
+#redButton, #blueButton {
+  height: 50px;
+  position: relative;
+  margin: -20px -50px;
+  width: 100px;
+  top: 70%;
+  left: 50%;
+  font-size: 2em;
+  font-family: 'Kanit', sans-serif;
+  color: white;
+  background: none;
+  border: none;
+  border-bottom: solid 5px white;
+}
+
+#redScore, #blueScore {
+  height: 50px;
+  position: relative;
+  margin: -20px -50px;
+  width: 100px;
+  top: 10%;
+  left: 50%;
+  font-size: 2em;
+  text-align: center;
+  font-family: 'Kanit', sans-serif;
+  color: white;
+  background: none;
+  border: none;
+  border-bottom: solid 5px white;
+}
+
+#question {
+  width: 700px;
   position: absolute;
-  left: 520px;
-  top: 100px;
-  width: 400px;
+  top: 30%;
+  left: 50%;
+  margin-left: -360px;
+  padding: 20px;
+  text-align: center;
+  font-size: 2.5em;
+  font-family: 'Kanit', sans-serif;
+  color: black;
+  background: white;
+}
+
+#drawingPage {
+  width: 100%;
+  height: 100%;
+  background: black;
+}
+
+#canvas {
+  width: 1000px;
+  height: 500px;
+  position: absolute;
+  top: 20%;
+  left: 50%;
+  margin-left: -500px;
+  box-shadow: 10px 10px 30px black;
 }
