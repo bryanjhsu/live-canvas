@@ -1,30 +1,35 @@
 // socket.io setting
 var socket = io.connect();
+
+
 // countdown part
 var timeleft = 0;
+// var downloadTimer = setInterval(function() {
+//   var value = 10 - timeleft;
+//   timeleft++;
+//   document.getElementById('countdown').innerHTML = value;
+//   if (value <= 0) {
+//     value = 10;
+//     timeleft = 0;
+//   }
+// }, 1000);
 
-var downloadTimer = setInterval(function() {
-  var value = 10 - timeleft;
-  timeleft++;
-  document.getElementById('countdown').innerHTML = value;
-  if (value <= 0) {
-    value = 10;
-    timeleft = 0;
-  }
-}, 1000);
 
+//my snake settings
+//position + color
 var currX = 0;
 var currY = 0;
-var pixelSize = 10;
-
 var r = Math.floor(Math.random()*255);
 var g = Math.floor(Math.random()*255);
 var b = Math.floor(Math.random()*255);
 
-
+//grid settings
+var pixelSize = 10;
 var grid_width = 1000;
 var grid_height = 500;
 
+//draw grid and choose color
+//TODO: change random color to choice from younho's question page
 function setup() {
   background(255);
   var canvas = createCanvas(grid_width, grid_height);
@@ -37,7 +42,6 @@ function setup() {
       rect(i, j, pixelSize, pixelSize);
     }
   }
-
   var yourColorClass = "";
   if(Math.random() < 0.5)
   {
@@ -52,8 +56,10 @@ function setup() {
   drawingInit(yourColorClass);
 }
 
+
+//receive on first load of the page. draws the live board
 socket.on('init', function(data) {
-  console.log(data);
+  // console.log(data);
   for(var i = 0; i < 100; i++)
   {
     for(var j = 0; j < 50; j++)
@@ -65,15 +71,26 @@ socket.on('init', function(data) {
   }
 });
 
+//will receive every time server receives a new draw message from any client
+//updates board with live colors
 socket.on('draw', function(data) {
-  console.log(data);
   noStroke();
   fill(data.colR, data.colG, data.colB);
   rect(data.posX, data.posY, pixelSize, pixelSize)
 });
 
-var r, g, b;
+//will receive every 10 seconds from server, updating the red and blue counts;
+//data.reds and data.blues to get count of each
+socket.on('update', function(data) {
+  console.log("red count: " + data.reds);
+  console.log("blue count: " + data.blues);
+});
 
+
+
+var r, g, b;
+//initialize board with client "snake" 
+//emits to server to update this client's snake position
 function drawingInit(color) {
 
   if(color == "red")
@@ -81,20 +98,19 @@ function drawingInit(color) {
     currX = floor(random(width/ 2 / pixelSize)) * pixelSize;
     currY = floor(random(height / pixelSize)) * pixelSize;
 
-    r = 255;
-    b = 0;
-    g = 0;
-    // g = Math.floor(Math.random()*255);
-    // b = Math.floor(Math.random()*255);
+    r = 255-Math.floor(Math.random()*20);;
+    g = Math.floor(Math.random()*120);
+    b = Math.floor(Math.random()*120);
+
   }
-  else
+  else //blue
   {
     currX = floor(random(width / 2 / pixelSize) + grid_width/20) * pixelSize;
     currY = floor(random(height / pixelSize)) * pixelSize;
 
-    r = 0
-    g = 0
-    b = 255;
+    r = Math.floor(Math.random()*120);
+    g = Math.floor(Math.random()*120);
+    b = 255-Math.floor(Math.random()*20);
   }
   
   var data = {
@@ -110,6 +126,9 @@ function drawingInit(color) {
   socket.emit('draw', data);
 }
 
+//draw the pixel path for current user
+//shows black square for local view
+//live view will eventually overwrite black square with myColor square
 function keyPressed() {
   // console.log(keyCode);
   var isMoved = false;
@@ -154,6 +173,5 @@ function keyPressed() {
 
     socket.emit('draw', data);
   };
-
   return false;
 }
