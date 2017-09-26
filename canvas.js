@@ -103,27 +103,13 @@ function setup() {
       rect(i, j, pixelSize, pixelSize);
     }
   }
-  // var yourColorClass = "";
-  // if (Math.random() < 0.5) {
-  //   yourColorClass = "red";
-  //   console.log("you are on the red team");
-  // } else {
-  //   yourColorClass = "blue";
-  //   console.log("you are on the blue team");
-  // }
-  // drawingInit(yourColorClass);
 }
 
+var initData;
 //receive on first load of the page. draws the live board
 socket.on('init', function(data) {
   // console.log(data);
-  for (var i = 0; i < 100; i++) {
-    for (var j = 0; j < 50; j++) {
-      var color = data[i][j];
-      fill(color.r, color.g, color.b);
-      rect(i * pixelSize, j * pixelSize, pixelSize, pixelSize)
-    }
-  }
+  initData = data;
 });
 
 //will receive every time server receives a new draw message from any client
@@ -134,55 +120,70 @@ socket.on('draw', function(data) {
   rect(data.posX, data.posY, pixelSize, pixelSize)
 });
 
-//will receive every 10 seconds from server, updating the red and blue counts;
+//will receive every 5 seconds from server, updating the red and blue counts;
 //data.reds and data.blues to get count of each
 //each count will be shown above the canvas
+var gameFinished = false;
 socket.on('update', function(data) {
-  console.log("red count: " + data.reds);
-  redScore.innerHTML = data.reds;
-  redSection.style.width = data.reds / (data.blues + data.reds) * 100 + '%'
-  redSection.style.transition = 'width 1s'
+  // console.log("red count: " + data.reds);
+  if(!gameFinished)
+  {
+    redScore.innerHTML = data.reds;
+    redSection.style.width = data.reds / (data.blues + data.reds) * 100 + '%'
+    redSection.style.transition = 'width 1s'
 
-  console.log("blue count: " + data.blues);
-  blueScore.innerHTML = data.blues;
-  blueSection.style.width = data.blues / (data.blues + data.reds) * 100 + '%';
-  blueSection.style.transition = 'width 1s'
+    // console.log("blue count: " + data.blues);
+    blueScore.innerHTML = data.blues;
+    blueSection.style.width = data.blues / (data.blues + data.reds) * 100 + '%';
+    blueSection.style.transition = 'width 1s'
 
-  var totalScore = data.reds + data.blues;
+    var totalScore = data.reds + data.blues;
 
-  if (totalScore >= 5000 && totalScore !== 0) {
-    if (data.reds > data.blues) {
-      redSection.style.width = '100%';
-      redSection.style.transition = 'width 1s ease';
-      redScore.innerHTML = '';
-      redScore.style.border = 'none';
-      blueScore.innerHTML = '';
-      blueScore.style.border = 'none';
+    if (totalScore >= 4990 && totalScore !== 0) {
+      if (data.reds > data.blues) {
+        redSection.style.width = '100%';
+        redSection.style.transition = 'width 1s ease';
+        redScore.innerHTML = '';
+        redScore.style.border = 'none';
+        blueScore.innerHTML = '';
+        blueScore.style.border = 'none';
+      }
+      if (data.blues > data.reds) {
+        blueSection.style.width = '100%';
+        blueSection.style.transition = 'width 1s ease';
+        redScore.innerHTML = '';
+        redScore.style.border = 'none';
+        blueScore.innerHTML = '';
+        blueScore.style.border = 'none';
+      }
+      // figure it out transition stuff
+      finalMessage.innerHTML = "DEMOCRACY";
+      finalMessage.style.fontSize = '7em';
+      finalMessage.style.transition = 'font-size 3s ease';
+
+      document.getElementById('song').play();
+      document.getElementById('song').volume = 0.05;
+
+      gameFinished = true;
     }
-    if (data.blues > data.reds) {
-      blueSection.style.width = '100%';
-      blueSection.style.transition = 'width 1s ease';
-      redScore.innerHTML = '';
-      redScore.style.border = 'none';
-      blueScore.innerHTML = '';
-      blueScore.style.border = 'none';
-    }
-    // figure it out transition stuff
-    finalMessage.innerHTML = "DEMOCRACY";
-    finalMessage.style.fontSize = '7em';
-    finalMessage.style.transition = 'font-size 3s ease';
-  }
+  } 
 });
-
-
 
 var r, g, b;
 //initialize board with client "snake"
 //emits to server to update this client's snake position
-function drawingInit(color) {
+function drawingInit(myColor) {
 
-  if (color == "red") {
-    currX = floor(random(width / 2 / pixelSize)) * pixelSize;
+  for (var i = 0; i < 100; i++) {
+    for (var j = 0; j < 50; j++) {
+      var color = initData[i][j];
+      fill(color.r, color.g, color.b);
+      rect(i * pixelSize, j * pixelSize, pixelSize, pixelSize)
+    }
+  }
+
+  if (myColor == "red") {
+    currX = floor(random(width / 4 / pixelSize)) * pixelSize;
     currY = floor(random(height / pixelSize)) * pixelSize;
 
     r = 255 - Math.floor(Math.random() * 20);;
@@ -191,7 +192,7 @@ function drawingInit(color) {
 
   } else //blue
   {
-    currX = floor(random(width / 2 / pixelSize) + grid_width / 20) * pixelSize;
+    currX = floor(random(width / 4 / pixelSize) + grid_width * 3 / 4 / pixelSize) * pixelSize;
     currY = floor(random(height / pixelSize)) * pixelSize;
 
     r = Math.floor(Math.random() * 120);
@@ -250,7 +251,9 @@ function keyPressed() {
     };
 
     fill(0);
-    rect(data.posX, data.posY, pixelSize, pixelSize)
+    rect(data.posX, data.posY, pixelSize, pixelSize);
+    document.getElementById('blip').play();
+    document.getElementById('blip').volume = 0.1;
 
     socket.emit('draw', data);
   };

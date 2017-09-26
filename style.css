@@ -12,6 +12,16 @@ canvas {
   display: block;
 }
 
+button {
+  cursor: pointer;
+  -webkit-transition: all 100ms ease;
+}
+
+button:hover{
+        transform: scale(1.5);
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    }
+
 /*#countdown {
   position: absolute;
   width: 100px;

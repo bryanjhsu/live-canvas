@@ -32,32 +32,38 @@ var board_width = 1000;
 var board_height = 500;
 var board = [];
 var r, g, b;
-for(var i = 0; i < board_width/pixelSize; i++)
+
+function cleanBoard()
 {
-  board[i] = [];
-  for(var j = 0; j < board_height/pixelSize; j++)
+  for(var i = 0; i < board_width/pixelSize; i++)
   {
-    if(i != 49)
+    board[i] = [];
+    for(var j = 0; j < board_height/pixelSize; j++)
     {
-      var colorData = {
-          r: 255,
-          b: 255,
-          g: 255,
-        };
-      board[i][j] = colorData;
-    }
-    else
-    {
-      var colorData = 
+      if(i != 49)
       {
-        r: 210,
-        b: 210,
-        g: 210,
-      }
+        var colorData = {
+            r: 255,
+            b: 255,
+            g: 255,
+          };
         board[i][j] = colorData;
+      }
+      else
+      {
+        var colorData = 
+        {
+          r: 210,
+          b: 210,
+          g: 210,
+        }
+          board[i][j] = colorData;
+      }
     }
   }
 }
+
+cleanBoard();
 
 // WebSocket Portion
 var io = require('socket.io').listen(httpServer);
@@ -94,7 +100,7 @@ io.sockets.on('connection',
           blues: blueCount
         };
       io.sockets.emit("update", countData);
-    }, 5000);
+    }, 3000);
 
     //receive snake data from client and emit same data to all clients
     socket.on('draw', function(data) {
